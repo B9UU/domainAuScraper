@@ -73,20 +73,18 @@ func openDB(tableName string) (*sql.DB, error) {
 	return db, nil
 }
 func main() {
+	defer Timer(23)()
 	db, err := openDB("first")
 	if err != nil {
 		log.Fatalln("unable to open database ", err)
 	}
+	reqPerSec := 5
+	r := NewRequester(reqPerSec)
 
-	responseData := Reqeust()
+	for i := 1; i <= 3; i++ {
 
-	for k, v := range responseData.Props.ListingsMap {
-		fmt.Println(k, v.ListingModel.Address)
-		_, err = insertRow(db, "first", v)
-		if err != nil {
-			log.Fatalln("Something went wrong insering the row", err)
-		}
-		fmt.Println(k, "to db success")
+		r.SendRequest(db, i)
+		fmt.Println("ss")
 	}
-
+	r.Wait()
 }
